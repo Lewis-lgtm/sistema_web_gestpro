@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Título do Projeto{% endblock %}</title>
+    <!-- Vinculando o arquivo CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <!-- Aqui você pode adicionar um menu de navegação -->
+            <ul>
+                <li><a href="/">Início</a></li>
+                <li><a href="/tarefas">Tarefas</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Esta parte será substituída pelo conteúdo das outras páginas -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Seu Nome ou Nome do Projeto. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

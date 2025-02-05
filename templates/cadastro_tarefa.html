@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Tarefa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Gestão de Tarefas</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('tarefas') }}">Ver Tarefas</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Cadastrar Nova Tarefa</h2>
+        <form action="{{ url_for('cadastrar_tarefa') }}" method="POST">
+            <div class="form-group">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="horas_est">Horas Estimadas:</label>
+                <input type="number" id="horas_est" name="horas_est" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label for="data_inicio">Data de Início:</label>
+                <input type="date" id="data_inicio" name="data_inicio" required>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="1">Não Iniciado</option>
+                    <option value="2">Em Progresso</option>
+                    <option value="3">Concluído</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo_tarefa">Tipo de Tarefa:</label>
+                <select id="tipo_tarefa" name="tipo_tarefa" required>
+                    <option value="1">Desenvolvimento</option>
+                    <option value="2">Teste</option>
+                    <option value="3">Revisão</option>
+                </select>
+            </div>
+
+            <button type="submit">Cadastrar Tarefa</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Sistema de Tarefas. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

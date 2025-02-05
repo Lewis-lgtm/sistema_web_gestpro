@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas Cadastradas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Gestão de Tarefas</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('cadastro_tarefa') }}">Cadastrar Nova Tarefa</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Tarefas Cadastradas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Horas Estimadas</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tarefa in tarefas %}
+                <tr>
+                    <td>{{ tarefa.Tarefa_ID }}</td>
+                    <td>{{ tarefa.Tarefa_Titulo }}</td>
+                    <td>{{ tarefa.Tarefa_Descricao }}</td>
+                    <td>{{ tarefa.Tarefa_HorasEstimadas }}</td>
+                    <td>{{ tarefa.status_tarefa.StatusTarefa_Titulo }}</td>
+                    <td>
+                        <a href="#">Editar</a> | <a href="#">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Sistema de Tarefas. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

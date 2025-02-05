@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento de Tarefas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Gerenciamento de Tarefas</h1>
+
+        <!-- Tabela para exibir as tarefas -->
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Horas Estimadas</th>
+                    <th>Data Início</th>
+                    <th>Data Fim</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tarefa in tarefas %}
+                    <tr>
+                        <td>{{ tarefa.Tarefa_ID }}</td>
+                        <td>{{ tarefa.Tarefa_Titulo }}</td>
+                        <td>{{ tarefa.Tarefa_Descricao }}</td>
+                        <td>{{ tarefa.Tarefa_HorasEstimadas }}</td>
+                        <td>{{ tarefa.Tarefa_DataInicio }}</td>
+                        <td>{{ tarefa.Tarefa_DataFim }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
