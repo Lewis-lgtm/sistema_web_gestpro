@@ -12,9 +12,12 @@ class Pessoa(db.Model):
     Pessoa_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Pessoa_Nome = db.Column(db.String(100), nullable=False)
     Pessoa_Email = db.Column(db.String(100), nullable=False, unique=True)
+    Pessoa_NivelSenioridade = db.Column(db.String(50), nullable=False)  # Campo adicionado
+    Pessoa_CustoPorHora = db.Column(db.Numeric(5, 2), nullable=False)  # Campo adicionado
     
     # Relacionamento 1:N com Tarefa
     tarefas = db.relationship('Tarefa', backref='pessoa', lazy=True)
+
 
 # Tabela Status_Tarefa
 class StatusTarefa(db.Model):
@@ -25,11 +28,6 @@ class StatusTarefa(db.Model):
     # Relacionamento 1:N com Tarefa
     tarefas = db.relationship('Tarefa', backref='status_tarefa', lazy=True)
 
-# Tabela Servico_Projeto
-class ServicoProjeto(db.Model):
-    __tablename__ = 'servico_projeto'
-    ServicoProjeto_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ServicoProjeto_Titulo = db.Column(db.String(100), nullable=False)
     
     # Relacionamento 1:N com Tarefa
     tarefas = db.relationship('Tarefa', backref='servico_projeto', lazy=True)
@@ -43,15 +41,6 @@ class TipoTarefa(db.Model):
     # Relacionamento 1:N com Tarefa
     tarefas = db.relationship('Tarefa', backref='tipo_tarefa', lazy=True)
 
-# Tabela Tarefa
-class Tarefa(db.Model):
-    __tablename__ = 'tarefa'
-    Tarefa_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Tarefa_Titulo = db.Column(db.String(255), nullable=False)
-    Tarefa_Descricao = db.Column(db.Text, nullable=True)
-    Tarefa_HorasEstimadas = db.Column(db.Numeric(5, 2), nullable=False)
-    Tarefa_DataInicio = db.Column(db.Date, nullable=False)
-    Tarefa_DataFim = db.Column(db.Date, nullable=True)
     
     # Relacionamentos
     Pessoa_ID = db.Column(db.Integer, db.ForeignKey('pessoa.Pessoa_ID'), nullable=False)

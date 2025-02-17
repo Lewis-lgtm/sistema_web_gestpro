@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from models import db, Pessoa, StatusTarefa, ServicoProjeto, TipoTarefa, Tarefa, LancamentoHoras, Projeto, TipoServico  # Importando os novos modelos
 from datetime import date
 
+#comeca o código
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -83,11 +84,13 @@ def cadastro_responsavel():
         nome = request.form['nome']
         nivel_senioridade = request.form['nivel_senioridade']
         custo_por_hora = request.form['custo_por_hora']
+        email = request.form['email']  # Captura o email do formulário
 
         responsavel = Pessoa(
             Pessoa_Nome=nome,
             Pessoa_NivelSenioridade=nivel_senioridade,
-            Pessoa_CustoPorHora=custo_por_hora
+            Pessoa_CustoPorHora=custo_por_hora,
+            Pessoa_Email=email  # Inclui o email na criação da instância
         )
 
         db.session.add(responsavel)
@@ -95,6 +98,7 @@ def cadastro_responsavel():
         return redirect(url_for('index'))
 
     return render_template('cadastro_responsavel.html')
+
 
 # Apontamento de horas
 @app.route('/apontar_horas/<int:tarefa_id>', methods=['GET', 'POST'])
