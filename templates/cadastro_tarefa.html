@@ -16,7 +16,6 @@
             </ul>
         </nav>
     </header>
-
     <main>
         <h2>Cadastrar Nova Tarefa</h2>
         <form action="{{ url_for('cadastrar_tarefa') }}" method="POST">
@@ -43,27 +42,27 @@
             <div class="form-group">
                 <label for="status">Status:</label>
                 <select id="status" name="status" required>
-                    <option value="1">Não Iniciado</option>
-                    <option value="2">Em Progresso</option>
-                    <option value="3">Concluído</option>
+                    {% for status in status_tarefas %}
+                        <option value="{{ status.StatusTarefa_ID }}">{{ status.StatusTarefa_Titulo }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="tipo_tarefa">Tipo de Tarefa:</label>
                 <select id="tipo_tarefa" name="tipo_tarefa" required>
-                    <option value="1">Desenvolvimento</option>
-                    <option value="2">Teste</option>
-                    <option value="3">Revisão</option>
+                    {% for tipo in tipos_tarefas %}
+                        <option value="{{ tipo.TipoTarefa_ID }}">{{ tipo.TipoTarefa_Titulo }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
             <button type="submit">Cadastrar Tarefa</button>
         </form>
     </main>
-
     <footer>
         <p>&copy; 2025 Sistema de Tarefas. Todos os direitos reservados.</p>
     </footer>
 </body>
 </html>
+

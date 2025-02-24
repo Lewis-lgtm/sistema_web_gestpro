@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate  # Importando o Migrate
 from models import db, Pessoa, StatusTarefa, ServicoProjeto, TipoTarefa, Tarefa, LancamentoHoras, Projeto, TipoServico
 from datetime import date
-
 import os
 
 # Inicialização do Flask
@@ -12,10 +11,8 @@ app = Flask(__name__)
 # Caminho absoluto para o banco de dados SQLite
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Pega o caminho onde o script principal está
 
-
 # Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "instance", "project.db")}'
-  # Caminho para o banco de dados SQLite
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Para evitar alertas desnecessários
 
 # Inicializando o Migrate e o db (db já é inicializado no models.py)
@@ -63,8 +60,6 @@ def cadastro_projeto():
     pessoas = Pessoa.query.all()
     return render_template('cadastro_projeto.html', pessoas=pessoas)
 
-# Demais rotas do app...
-
 
 @app.route('/cadastro_servico', methods=['GET', 'POST'])  # Cadastro de serviço
 def cadastro_servico():
@@ -104,6 +99,7 @@ def cadastro_tipo_servico():
 
     return render_template('cadastro_tipo_servico.html')
 
+
 @app.route('/cadastro_responsavel', methods=['GET', 'POST'])  # Cadastro de responsável
 def cadastro_responsavel():
     if request.method == 'POST':
@@ -125,20 +121,19 @@ def cadastro_responsavel():
 
     return render_template('cadastro_responsavel.html')
 
+
 @app.route('/')
 def index():
     # Buscar tarefas para exibir na página principal (exemplo, pode ser algo mais relevante)
     tarefas = Tarefa.query.all()
-    print(tarefas)  # Isso imprime no terminal para você verificar se as tarefas estão sendo retornadas
     return render_template('index.html', tarefas=tarefas)
 
 
-# Apontamento de horas
 @app.route('/apontar_horas/<int:tarefa_id>', methods=['GET', 'POST'])
 def apontar_horas(tarefa_id):
     tarefa = Tarefa.query.get_or_404(tarefa_id)
     if request.method == 'POST':
-        horas_trabalhadas = request.form['horas_trabalhadas']
+        horas_trabalhadas = float(request.form['horas_trabalhadas'])
         lancamento = LancamentoHoras(
             Lancamento_Data=date.today(),
             Lancamento_Horas=horas_trabalhadas,
@@ -150,4 +145,5 @@ def apontar_horas(tarefa_id):
         return redirect(url_for('index'))
     
     return render_template('apontar_horas.html', tarefa=tarefa)
+
 

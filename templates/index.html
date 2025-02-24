@@ -9,8 +9,6 @@
 <body>
     <div class="container">
         <h1>Sistema de Gerenciamento de Tarefas</h1>
-
-        <!-- Tabela para exibir as tarefas -->
         <table border="1">
             <thead>
                 <tr>
@@ -20,6 +18,7 @@
                     <th>Horas Estimadas</th>
                     <th>Data Início</th>
                     <th>Data Fim</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,6 +30,7 @@
                         <td>{{ tarefa.Tarefa_HorasEstimadas }}</td>
                         <td>{{ tarefa.Tarefa_DataInicio }}</td>
                         <td>{{ tarefa.Tarefa_DataFim }}</td>
+                        <td>{{ tarefa.status_tarefa.StatusTarefa_Titulo }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

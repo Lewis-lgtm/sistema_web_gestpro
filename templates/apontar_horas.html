@@ -1,5 +1,31 @@
-<form method="POST">
-    <label for="horas_trabalhadas">Horas Trabalhadas</label>
-    <input type="number" step="0.01" id="horas_trabalhadas" name="horas_trabalhadas" required>
-    <button type="submit">Apontar Horas</button>
-</form>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apontar Horas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Gestão de Tarefas</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('tarefas') }}">Ver Tarefas</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Apontar Horas Trabalhadas</h2>
+        <form method="POST">
+            <label for="horas_trabalhadas">Horas Trabalhadas</label>
+            <input type="number" step="0.01" id="horas_trabalhadas" name="horas_trabalhadas" required>
+            <button type="submit">Apontar Horas</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 Sistema de Tarefas. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>
