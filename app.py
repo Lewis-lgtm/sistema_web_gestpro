@@ -1,17 +1,39 @@
 from flask import Flask, render_template, request, redirect, url_for
-from models import db, Pessoa, StatusTarefa, ServicoProjeto, TipoTarefa, Tarefa, LancamentoHoras, Projeto, TipoServico  # Importando os novos modelos
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate  # Importando o Migrate
+from models import db, Pessoa, StatusTarefa, ServicoProjeto, TipoTarefa, Tarefa, LancamentoHoras, Projeto, TipoServico
 from datetime import date
 
-#comeca o código
+import os
+
+# Inicialização do Flask
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Caminho absoluto para o banco de dados SQLite
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Pega o caminho onde o script principal está
+
+
+# Configuração do banco de dados
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "instance", "project.db")}'
+  # Caminho para o banco de dados SQLite
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Para evitar alertas desnecessários
+
+# Inicializando o Migrate e o db (db já é inicializado no models.py)
+migrate = Migrate(app, db)
+
+# Inicializando o db com o app
 db.init_app(app)
 
-@app.route('/')
-def index():
-    tarefas = Tarefa.query.all()  
-    return render_template('index.html', tarefas=tarefas)
+# Criando o banco de dados dentro do bloco `if __name__ == '__main__':`
+if __name__ == '__main__':
+    # Criando o banco de dados se ele não existir
+    with app.app_context():
+        db.create_all()  # Isso deve ser chamado dentro do app.app_context()
+        print("Banco de dados criado com sucesso!")
+
+    # Rodando o servidor Flask
+    app.run(debug=True)
+
 
 @app.route('/cadastro_projeto', methods=['GET', 'POST'])
 def cadastro_projeto():
@@ -37,9 +59,12 @@ def cadastro_projeto():
         db.session.add(projeto)
         db.session.commit()
         return redirect(url_for('index'))
-     # Buscar todas as pessoas para o campo de responsável
+    
     pessoas = Pessoa.query.all()
     return render_template('cadastro_projeto.html', pessoas=pessoas)
+
+# Demais rotas do app...
+
 
 @app.route('/cadastro_servico', methods=['GET', 'POST'])  # Cadastro de serviço
 def cadastro_servico():
@@ -60,6 +85,7 @@ def cadastro_servico():
 
     tipos_servicos = TipoServico.query.all()  # Buscar tipos de serviços para o formulário
     return render_template('cadastro_servico.html', tipos_servicos=tipos_servicos)
+
 
 @app.route('/cadastro_tipo_servico', methods=['GET', 'POST'])  # Cadastro de tipo de serviço
 def cadastro_tipo_servico():
@@ -99,6 +125,13 @@ def cadastro_responsavel():
 
     return render_template('cadastro_responsavel.html')
 
+@app.route('/')
+def index():
+    # Buscar tarefas para exibir na página principal (exemplo, pode ser algo mais relevante)
+    tarefas = Tarefa.query.all()
+    print(tarefas)  # Isso imprime no terminal para você verificar se as tarefas estão sendo retornadas
+    return render_template('index.html', tarefas=tarefas)
+
 
 # Apontamento de horas
 @app.route('/apontar_horas/<int:tarefa_id>', methods=['GET', 'POST'])
@@ -118,5 +151,3 @@ def apontar_horas(tarefa_id):
     
     return render_template('apontar_horas.html', tarefa=tarefa)
 
-if __name__ == '__main__':
-    app.run(debug=True)
