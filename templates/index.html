@@ -9,6 +9,11 @@
 <body>
     <div class="container">
         <h1>Sistema de Gerenciamento de Tarefas</h1>
+
+        <!-- Link para cadastrar nova tarefa -->
+        <a href="{{ url_for('cadastro_tarefa') }}" class="btn-cadastrar">Cadastrar Nova Tarefa</a>
+
+        <!-- Tabela para exibir as tarefas -->
         <table border="1">
             <thead>
                 <tr>
@@ -38,4 +43,3 @@
     </div>
 </body>
 </html>
-

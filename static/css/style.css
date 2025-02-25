@@ -102,3 +102,21 @@ button {
 button:hover {
     background-color: #45a049;
 }
+
+/* Estilo para o botão de cadastrar nova tarefa */
+.btn-cadastrar {
+    background-color: #007bff; /* Cor de fundo azul */
+    color: white;
+    padding: 12px 20px;
+    text-decoration: none; /* Remove o sublinhado do link */
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    margin-bottom: 15px; /* Espaçamento entre o botão e a tabela */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Efeito suave ao passar o mouse */
+}
+
+.btn-cadastrar:hover {
+    background-color: #0056b3; /* Cor de fundo quando o botão for hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Efeito de sombra ao passar o mouse */
+}
