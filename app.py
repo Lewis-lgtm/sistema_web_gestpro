@@ -147,3 +147,25 @@ def apontar_horas(tarefa_id):
     return render_template('apontar_horas.html', tarefa=tarefa)
 
 
+@app.route('/cadastro_tarefa', methods=['GET', 'POST'])  # Cadastro de tarefa
+def cadastro_tarefa():
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        descricao = request.form['descricao']
+        horas_estimadas = request.form['horas_estimadas']
+        data_inicio = request.form['data_inicio']
+        data_fim = request.form['data_fim']
+
+        tarefa = Tarefa(
+            Tarefa_Titulo=titulo,
+            Tarefa_Descricao=descricao,
+            Tarefa_HorasEstimadas=horas_estimadas,
+            Tarefa_DataInicio=data_inicio,
+            Tarefa_DataFim=data_fim
+        )
+
+        db.session.add(tarefa)
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    return render_template('cadastro_tarefa.html')  # Crie este template
