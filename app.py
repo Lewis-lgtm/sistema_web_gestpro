@@ -122,31 +122,6 @@ def cadastro_responsavel():
     return render_template('cadastro_responsavel.html')
 
 
-@app.route('/')
-def index():
-    # Buscar tarefas para exibir na página principal (exemplo, pode ser algo mais relevante)
-    tarefas = Tarefa.query.all()
-    return render_template('index.html', tarefas=tarefas)
-
-
-@app.route('/apontar_horas/<int:tarefa_id>', methods=['GET', 'POST'])
-def apontar_horas(tarefa_id):
-    tarefa = Tarefa.query.get_or_404(tarefa_id)
-    if request.method == 'POST':
-        horas_trabalhadas = float(request.form['horas_trabalhadas'])
-        lancamento = LancamentoHoras(
-            Lancamento_Data=date.today(),
-            Lancamento_Horas=horas_trabalhadas,
-            Tarefa_ID=tarefa_id
-        )
-        tarefa.Tarefa_HorasGastas += horas_trabalhadas
-        db.session.add(lancamento)
-        db.session.commit()
-        return redirect(url_for('index'))
-    
-    return render_template('apontar_horas.html', tarefa=tarefa)
-
-
 @app.route('/cadastro_tarefa', methods=['GET', 'POST'])  # Cadastro de tarefa
 def cadastro_tarefa():
     if request.method == 'POST':
@@ -169,3 +144,28 @@ def cadastro_tarefa():
         return redirect(url_for('index'))
     
     return render_template('cadastro_tarefa.html')  # Crie este template
+
+
+@app.route('/')
+def index():
+    # Buscar tarefas para exibir na página principal
+    tarefas = Tarefa.query.all()
+    return render_template('index.html', tarefas=tarefas)
+
+
+@app.route('/apontar_horas/<int:tarefa_id>', methods=['GET', 'POST'])
+def apontar_horas(tarefa_id):
+    tarefa = Tarefa.query.get_or_404(tarefa_id)
+    if request.method == 'POST':
+        horas_trabalhadas = float(request.form['horas_trabalhadas'])
+        lancamento = LancamentoHoras(
+            Lancamento_Data=date.today(),
+            Lancamento_Horas=horas_trabalhadas,
+            Tarefa_ID=tarefa_id
+        )
+        tarefa.Tarefa_HorasGastas += horas_trabalhadas
+        db.session.add(lancamento)
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    return render_template('apontar_horas.html', tarefa=tarefa)
