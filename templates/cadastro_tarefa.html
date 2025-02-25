@@ -11,14 +11,14 @@
         <h1>Sistema de Gestão de Tarefas</h1>
         <nav>
             <ul>
-                <li><a href="{{ url_for('index') }}">Início</a></li>
-                <li><a href="{{ url_for('tarefas') }}">Ver Tarefas</a></li>
+                <li><a href="{{ url_for('index') }}">Início</a></li> <!-- Correção aqui -->
+                <li><a href="{{ url_for('index') }}">Ver Tarefas</a></li> <!-- Correção aqui -->
             </ul>
         </nav>
     </header>
     <main>
         <h2>Cadastrar Nova Tarefa</h2>
-        <form action="{{ url_for('cadastrar_tarefa') }}" method="POST">
+        <form action="{{ url_for('cadastro_tarefa') }}" method="POST">
             <div class="form-group">
                 <label for="titulo">Título:</label>
                 <input type="text" id="titulo" name="titulo" required>
@@ -65,4 +65,5 @@
     </footer>
 </body>
 </html>
+
 
