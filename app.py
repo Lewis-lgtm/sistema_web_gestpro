@@ -33,7 +33,7 @@ class Pessoa(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     nivel_senioridade = db.Column(db.String(50), nullable=False)
-    custo_por_hora = db.Column(db.Float, nullable=False)
+    custo_por_hora = db.Column(db.Numeric(10, 2), nullable=False)  # Usando db.Numeric para garantir precisão
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(100), nullable=False)  # Senha armazenada de forma segura
 
@@ -77,12 +77,43 @@ class ServicoProjeto(db.Model):
     def __repr__(self):
         return f'<ServicoProjeto {self.titulo}>'
 
+
+class StatusTarefa(db.Model):
+    __tablename__ = 'status_tarefa'
+
+    StatusTarefa_ID = db.Column(db.Integer, primary_key=True)
+    StatusTarefa_Nome = db.Column(db.String(100), nullable=False)
+
+    # Relacionamento com TipoTarefa
+    tipo_tarefas = db.relationship('TipoTarefa', backref='status_tarefa', lazy=True)
+
+    def __repr__(self):
+        return f'<StatusTarefa {self.StatusTarefa_Nome}>'
+    
+
+# Função para adicionar os status
+def adicionar_status():
+    # Criar os objetos para os status
+    status_pendente = StatusTarefa(StatusTarefa_Nome="Pendente")
+    status_em_progresso = StatusTarefa(StatusTarefa_Nome="Em Progresso")
+    status_concluida = StatusTarefa(StatusTarefa_Nome="Concluída")
+
+    # Adicionar os status no banco de dados
+    db.session.add_all([status_pendente, status_em_progresso, status_concluida])
+    db.session.commit()
+    print("Status adicionados com sucesso!")
+
+# Chamar a função para adicionar os status ao banco (apenas uma vez, ou por necessidade)
+if __name__ == "__main__":
+    with app.app_context():
+        adicionar_status()
+        
 class Tarefa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.String(200), nullable=False)
-    horas_estimadas = db.Column(db.Integer, nullable=False)
-    horas_gastas = db.Column(db.Integer, default=0)
+    horas_estimadas = db.Column(db.Integer, nullable=False)  # Horas estimadas podem ser um inteiro
+    horas_gastas = db.Column(db.Numeric(10, 2), default=0)  # Usando db.Numeric para precisão de horas gastas
     data_inicio = db.Column(db.Date, nullable=False)
     data_fim = db.Column(db.Date, nullable=False)
     projeto_id = db.Column(db.Integer, db.ForeignKey('projeto.id'), nullable=False)
@@ -93,6 +124,31 @@ class Tarefa(db.Model):
 
     def __repr__(self):
         return f'<Tarefa {self.titulo}>'
+    
+    # Definição da tabela tipo_tarefa
+class TipoTarefa(db.Model):
+    __tablename__ = 'tipo_tarefa'
+
+    TipoTarefa_ID = db.Column(db.Integer, primary_key=True)
+    TipoTarefa_Nome = db.Column(db.String(100), nullable=False)
+    Pessoa_ID = db.Column(db.Integer, db.ForeignKey('pessoa.id'), nullable=False)  # Corrigir o nome da chave estrangeira
+    StatusTarefa_ID = db.Column(db.Integer, db.ForeignKey('status_tarefa.StatusTarefa_ID'), nullable=False)
+    ServicoProjeto_ID = db.Column(db.Integer, db.ForeignKey('servico_projeto.id'), nullable=True)  # Corrigir o nome da chave estrangeira
+
+    # Relacionamentos
+    pessoa = db.relationship('Pessoa', backref='tipo_tarefas', lazy=True)
+    status_tarefa = db.relationship('StatusTarefa', backref='tipo_tarefas', lazy=True)
+    servico_projeto = db.relationship('ServicoProjeto', backref='tipo_tarefas', lazy=True)
+
+    def __init__(self, TipoTarefa_Nome, Pessoa_ID, StatusTarefa_ID, ServicoProjeto_ID=None):
+        self.TipoTarefa_Nome = TipoTarefa_Nome
+        self.Pessoa_ID = Pessoa_ID
+        self.StatusTarefa_ID = StatusTarefa_ID
+        self.ServicoProjeto_ID = ServicoProjeto_ID
+
+# Agora, inicialize o banco de dados (pode ser feito dentro de um script ou shell)
+with app.app_context():
+    db.create_all()  # Cria todas as tabelas
 
 class LancamentoHoras(db.Model):
     id = db.Column(db.Integer, primary_key=True)
