@@ -14,7 +14,7 @@ class Pessoa(db.Model):
     tarefas = db.relationship('Tarefa', backref='responsavel', lazy=True)
 
     def __repr__(self):
-        return f'<Pessoa {self.nome}>'
+        return f'<Pessoa {self.email}>'
 
 # Tabela StatusTarefa
 class StatusTarefa(db.Model):
