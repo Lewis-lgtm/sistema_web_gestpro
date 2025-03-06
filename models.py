@@ -1,114 +1,153 @@
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine, Column, Integer, String, Numeric, Date, ForeignKey, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+import os
 
-db = SQLAlchemy()
+# Definindo a base do SQLAlchemy
+Base = declarative_base()
 
-# Tabela Pessoa
-class Pessoa(db.Model):
+# Definindo o caminho do banco de dados (SQLite local)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DATABASE_URL = 'mysql+pymysql://root:12345678@localhost:3306/meu_banco'
+
+
+# Criando a engine do banco de dados
+engine = create_engine(DATABASE_URL, echo=True)
+
+# Criando a classe de sessão para interagir com o banco
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session = SessionLocal()
+
+# Tabela Pessoa (Agora inclui campo 'perfil')
+class Pessoa(Base):
     __tablename__ = 'pessoa'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    nome = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False, unique=True)
-    nivel_senioridade = db.Column(db.String(50), nullable=False)
-    custo_por_hora = db.Column(db.Numeric(5, 2), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)  
+    nome = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
+    nivel_senioridade = Column(String(50), nullable=False)
+    custo_por_hora = Column(Numeric(5, 2), nullable=False)
+    perfil = Column(String(50), nullable=False)  # 'admin', 'gerente', 'colaborador'
 
-    tarefas = db.relationship('Tarefa', backref='responsavel', lazy=True)
+    tarefas = relationship('Tarefa', backref='responsavel', lazy=True)
 
     def __repr__(self):
         return f'<Pessoa {self.email}>'
 
 # Tabela StatusTarefa
-class StatusTarefa(db.Model):
+class StatusTarefa(Base):
     __tablename__ = 'status_tarefa'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    titulo = db.Column(db.String(100), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    titulo = Column(String(100), nullable=False)
 
-    tarefas = db.relationship('Tarefa', backref='status_tarefa', lazy=True)
+    tarefas = relationship('Tarefa', backref='status_tarefa', lazy=True)
 
     def __repr__(self):
         return f'<StatusTarefa {self.titulo}>'
 
 # Tabela TipoTarefa
-class TipoTarefa(db.Model):
+class TipoTarefa(Base):
     __tablename__ = 'tipo_tarefa'
     
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    nome = db.Column(db.String(100), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)  
+    nome = Column(String(100), nullable=False)
     
-    pessoa_id = db.Column(db.Integer, db.ForeignKey('pessoa.id'), nullable=False)  
-    status_tarefa_id = db.Column(db.Integer, db.ForeignKey('status_tarefa.id'), nullable=False)  
-    servico_projeto_id = db.Column(db.Integer, db.ForeignKey('servico_projeto.id'), nullable=True)
+    pessoa_id = Column(Integer, ForeignKey('pessoa.id'), nullable=False)  
+    status_tarefa_id = Column(Integer, ForeignKey('status_tarefa.id'), nullable=False)  
+    servico_projeto_id = Column(Integer, ForeignKey('servico_projeto.id'), nullable=True)
 
-    pessoa = db.relationship('Pessoa', backref='tipo_tarefas')
-    status_tarefa = db.relationship('StatusTarefa', backref='tipo_tarefas')
-    servico_projeto = db.relationship('ServicoProjeto', backref='tipo_tarefas', lazy=True)
+    pessoa = relationship('Pessoa', backref='tipo_tarefas')
+    status_tarefa = relationship('StatusTarefa', backref='tipo_tarefas')
+    servico_projeto = relationship('ServicoProjeto', backref='tipo_tarefas', lazy=True)
 
-    lancamentos_horas = db.relationship('LancamentoHoras', backref='tipo_tarefa_lancamentos', lazy=True)
+    lancamentos_horas = relationship('LancamentoHoras', backref='tipo_tarefa_lancamentos', lazy=True)
 
     def __repr__(self):
         return f'<TipoTarefa {self.nome}>'
 
+# Tabela TipoServico (novo modelo)
+class TipoServico(Base):
+    __tablename__ = 'tipo_servico'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    titulo = Column(String(100), nullable=False)
+    horas_fechadas = Column(Numeric(5, 2), nullable=False)
+
+    def __repr__(self):
+        return f'<TipoServico {self.titulo}>'
+
 # Tabela ServicoProjeto
-class ServicoProjeto(db.Model):
+class ServicoProjeto(Base):
     __tablename__ = 'servico_projeto'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    titulo = db.Column(db.String(100), nullable=False)
-    descricao = db.Column(db.Text, nullable=False)
-    tipo_servico_id = db.Column(db.Integer, db.ForeignKey('tipo_servico.id'), nullable=False)  
-    projeto_id = db.Column(db.Integer, db.ForeignKey('projeto.id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)  
+    titulo = Column(String(100), nullable=False)
+    descricao = Column(Text, nullable=False)
+    tipo_servico_id = Column(Integer, ForeignKey('tipo_servico.id'), nullable=False)  
+    projeto_id = Column(Integer, ForeignKey('projeto.id'), nullable=False)
 
     def __repr__(self):
         return f'<ServicoProjeto {self.titulo}>'
 
 # Tabela Projeto
-class Projeto(db.Model):
+class Projeto(Base):
     __tablename__ = 'projeto'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    nome = db.Column(db.String(255), nullable=False)
-    descricao = db.Column(db.Text, nullable=False)
-    data_inicio = db.Column(db.Date, nullable=False)
-    data_fim_previsto = db.Column(db.Date, nullable=False)
-    cliente = db.Column(db.String(100), nullable=False)
-    responsavel_id = db.Column(db.Integer, db.ForeignKey('pessoa.id'), nullable=False)  
-    total_horas_estimadas = db.Column(db.Numeric(5, 2), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)  
+    nome = Column(String(255), nullable=False)
+    descricao = Column(Text, nullable=False)
+    data_inicio = Column(Date, nullable=False)
+    data_fim_previsto = Column(Date, nullable=False)
+    cliente = Column(String(100), nullable=False)
+    responsavel_id = Column(Integer, ForeignKey('pessoa.id'), nullable=False)  
+    total_horas_estimadas = Column(Numeric(5, 2), nullable=False)
 
-    servicos = db.relationship('ServicoProjeto', backref='projeto', lazy=True)
+    servicos = relationship('ServicoProjeto', backref='projeto', lazy=True)
 
     def __repr__(self):
         return f'<Projeto {self.nome}>'
 
 # Tabela Tarefa
-class Tarefa(db.Model):
+class Tarefa(Base):
     __tablename__ = 'tarefa'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    titulo = db.Column(db.String(255), nullable=False)
-    descricao = db.Column(db.Text, nullable=True)
-    horas_estimadas = db.Column(db.Numeric(5, 2), nullable=False)
-    horas_gastas = db.Column(db.Numeric(5, 2), nullable=False, default=0)
-    data_inicio = db.Column(db.Date, nullable=False)
-    data_fim = db.Column(db.Date, nullable=True)
-    projeto_id = db.Column(db.Integer, db.ForeignKey('projeto.id'), nullable=False)  
-    responsavel_id = db.Column(db.Integer, db.ForeignKey('pessoa.id'), nullable=False)  
-    status_tarefa_id = db.Column(db.Integer, db.ForeignKey('status_tarefa.id'), nullable=False)  
-    servico_projeto_id = db.Column(db.Integer, db.ForeignKey('servico_projeto.id'), nullable=True)  
-    tipo_tarefa_id = db.Column(db.Integer, db.ForeignKey('tipo_tarefa.id'), nullable=False)  
+    id = Column(Integer, primary_key=True, autoincrement=True)  
+    titulo = Column(String(255), nullable=False)
+    descricao = Column(Text, nullable=True)
+    horas_estimadas = Column(Numeric(5, 2), nullable=False)
+    horas_gastas = Column(Numeric(5, 2), nullable=False, default=0)
+    data_inicio = Column(Date, nullable=False)
+    data_fim = Column(Date, nullable=True)
+    projeto_id = Column(Integer, ForeignKey('projeto.id'), nullable=False)  
+    responsavel_id = Column(Integer, ForeignKey('pessoa.id'), nullable=False)  
+    status_tarefa_id = Column(Integer, ForeignKey('status_tarefa.id'), nullable=False)  
+    servico_projeto_id = Column(Integer, ForeignKey('servico_projeto.id'), nullable=True)  
+    tipo_tarefa_id = Column(Integer, ForeignKey('tipo_tarefa.id'), nullable=False)  
 
-    tipo_tarefa = db.relationship('TipoTarefa', backref='tarefas', lazy=True)
+    tipo_tarefa = relationship('TipoTarefa', backref='tarefas', lazy=True)
 
     def __repr__(self):
         return f'<Tarefa {self.titulo}>'
 
 # Tabela LançamentoHoras
-class LancamentoHoras(db.Model):
+class LancamentoHoras(Base):
     __tablename__ = 'lancamento_horas'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    data = db.Column(db.Date, nullable=False)
-    horas = db.Column(db.Numeric(5, 2), nullable=False)
-    tarefa_id = db.Column(db.Integer, db.ForeignKey('tarefa.id'), nullable=False)  
-    tipo_tarefa_id = db.Column(db.Integer, db.ForeignKey('tipo_tarefa.id'), nullable=False)  
+    id = Column(Integer, primary_key=True, autoincrement=True)  
+    data = Column(Date, nullable=False)
+    horas = Column(Numeric(5, 2), nullable=False)
+    tarefa_id = Column(Integer, ForeignKey('tarefa.id'), nullable=False)  
+    tipo_tarefa_id = Column(Integer, ForeignKey('tipo_tarefa.id'), nullable=False)  
 
-    tipo_tarefa = db.relationship('TipoTarefa', lazy=True)
+    tipo_tarefa = relationship('TipoTarefa', lazy=True)
 
     def __repr__(self):
         return f'<LancamentoHoras {self.horas}>'
 
+# Tabela ApontamentoHoras (novo modelo)
+class ApontamentoHoras(Base):
+    __tablename__ = 'apontamento_horas'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    data = Column(Date, nullable=False)
+    tarefa_id = Column(Integer, ForeignKey('tarefa.id'), nullable=False)
+    horas_trabalhadas = Column(Numeric(5, 2), nullable=False)
+
+    tarefa = relationship('Tarefa', backref='apontamentos', lazy=True)
+
+    def __repr__(self):
+        return f'<ApontamentoHoras {self.horas_trabalhadas} horas em {self.data}>'
 
