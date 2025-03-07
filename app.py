@@ -32,6 +32,9 @@ def criar_usuario(nome, email, senha, perfil):
 # Função para realizar login
 def login_page():
     st.title("Login")
+
+    # Criação do usuário de teste (apenas para testes)
+    criar_usuario('Administrador', 'admin@teste.com', 'senha123', 'admin')
     
     email = st.text_input('Email')
     senha = st.text_input('Senha', type='password')
