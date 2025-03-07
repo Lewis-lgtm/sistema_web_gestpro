@@ -1,9 +1,11 @@
 import streamlit as st
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Pessoa, Projeto, Tarefa, TipoServico, ServicoProjeto, ApontamentoHoras, db
+from models import Pessoa, Projeto, Tarefa, TipoServico, ServicoProjeto, ApontamentoHoras
 from datetime import date
 import os
+import bcrypt
+
 
 # Conectar ao banco de dados
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -12,6 +14,20 @@ DATABASE_URI = 'mysql+pymysql://root:12345678@localhost:3306/meu_banco'
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
+
+# Função para criar um novo usuário
+def criar_usuario(nome, email, senha, perfil):
+    # Hashificando a senha antes de salvar no banco de dados
+    hashed_password = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+    
+    # Criando o novo usuário com a senha hashificada
+    usuario = Pessoa(nome=nome, email=email, senha=hashed_password, perfil=perfil)
+    
+    # Adicionando o novo usuário à sessão do banco de dados e commitando
+    session.add(usuario)
+    session.commit()
+    print(f"Usuário {nome} criado com sucesso!")
+
 
 # Função para realizar login
 def login_page():
@@ -22,7 +38,9 @@ def login_page():
     
     if st.button('Entrar'):
         usuario = session.query(Pessoa).filter_by(email=email).first()
-        if usuario and usuario.senha == senha:
+        
+        # Verifica se o usuário existe e se a senha digitada confere com o hash da senha no banco
+        if usuario and bcrypt.checkpw(senha.encode('utf-8'), usuario.senha.encode('utf-8')):
             st.session_state['user_id'] = usuario.id
             st.success("Login bem-sucedido")
             return True
@@ -30,6 +48,24 @@ def login_page():
             st.error('Email ou senha inválidos')
             return False
     return False
+
+# Função para página de cadastro
+def cadastro_page():
+    st.title("Cadastro de Usuário")
+    
+    nome = st.text_input('Nome')
+    email = st.text_input('Email')
+    senha = st.text_input('Senha', type='password')
+    perfil = st.selectbox('Perfil', ['admin', 'gerente', 'colaborador'])
+    
+    if st.button('Cadastrar'):
+        # Verifica se todos os campos foram preenchidos
+        if nome and email and senha and perfil:
+            # Chama a função para criar o usuário com a senha hashificada
+            criar_usuario(nome, email, senha, perfil)
+            st.success(f"Usuário {nome} cadastrado com sucesso!")
+        else:
+            st.error("Preencha todos os campos!")
 
 # Função para calcular o custo total de um projeto
 def calcular_custo_total(projeto_id):

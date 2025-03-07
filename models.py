@@ -24,6 +24,7 @@ class Pessoa(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)  
     nome = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
+    senha = Column(String(255), nullable=False)  # Adicionando o campo senha
     nivel_senioridade = Column(String(50), nullable=False)
     custo_por_hora = Column(Numeric(5, 2), nullable=False)
     perfil = Column(String(50), nullable=False)  # 'admin', 'gerente', 'colaborador'
