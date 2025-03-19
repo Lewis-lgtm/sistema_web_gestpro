@@ -60,7 +60,8 @@ class TipoTarefa(Base):
     status_tarefa = relationship('StatusTarefa', backref='tipo_tarefas')
     servico_projeto = relationship('ServicoProjeto', backref='tipo_tarefas', lazy=True)
 
-    lancamentos_horas = relationship('LancamentoHoras', backref='tipo_tarefa_lancamentos', lazy=True)
+      # Relacionamento inverso com LancamentoHoras
+    lancamentos_horas = relationship('LancamentoHoras', back_populates='tipo_tarefa', lazy=True)
 
     def __repr__(self):
         return f'<TipoTarefa {self.nome}>'
@@ -134,7 +135,8 @@ class LancamentoHoras(Base):
     tarefa_id = Column(Integer, ForeignKey('tarefa.id'), nullable=False)  
     tipo_tarefa_id = Column(Integer, ForeignKey('tipo_tarefa.id'), nullable=False)  
 
-    tipo_tarefa = relationship('TipoTarefa', lazy=True)
+     # Relacionamento com TipoTarefa
+    tipo_tarefa = relationship('TipoTarefa', back_populates='lancamentos_horas', lazy=True)
 
     def __repr__(self):
         return f'<LancamentoHoras {self.horas}>'
